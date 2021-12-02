@@ -36,7 +36,7 @@ databricks secrets put --scope <scope-name>  --key <value>
 * Task_1 - Top 10 hotels with max absolute temperature difference by month.
 ![](screenshots/task1.png)
 ![](screenshots/diff1.png)
-
+```
 == Parsed Logical Plan ==
 'CreateTableAsSelectStatement [top_hotels_max_temp_diff], DELTA, , false, false
 +- 'GlobalLimit 10
@@ -72,7 +72,7 @@ AtomicCreateTableAsSelect [num_affected_rows#2641L, num_inserted_rows#2642L], co
          +- Exchange hashpartitioning(address#2585, id#2591, year#2596, month#2597, 200), ENSURE_REQUIREMENTS, [id=#1814]
             +- HashAggregate(keys=[address#2585, id#2591, year#2596, month#2597], functions=[partial_max(avg_tmpr_c#2586) AS max#2620, partial_min(avg_tmpr_c#2586) AS min#2622], output=[address#2585, id#2591, year#2596, month#2597, max#2620, min#2622])
                +- FileScan parquet default.hotel_weather_silver[address#2585,avg_tmpr_c#2586,id#2591,year#2596,month#2597] Batched: true, DataFilters: [], Format: Parquet, Location: PreparedDeltaFileIndex(1 paths)[abfss://data@stsafrwesteurope.dfs.core.windows.net/silver/hotel-w..., PartitionFilters: [], PushedFilters: [], ReadSchema: struct<address:string,avg_tmpr_c:double,id:string,year:int,month:int>
-               
+  ```             
                
 * Reading the file and analyzing it
 * Filtering based on the criteria
@@ -83,7 +83,7 @@ AtomicCreateTableAsSelect [num_affected_rows#2641L, num_inserted_rows#2642L], co
 * Task_2 -Top 10 busy (e.g., with the biggest visits count) hotels for each month. If visit dates refer to several months, it should be counted for all affected months.
 ![](screenshots/task2.png)
 ![](screenshots/visits2.png)
-
+```
                == Parsed Logical Plan ==
                'GlobalLimit 10
                +- 'LocalLimit 10
@@ -150,7 +150,7 @@ AtomicCreateTableAsSelect [num_affected_rows#2641L, num_inserted_rows#2642L], co
                                                       +- Exchange SinglePartition, ENSURE_REQUIREMENTS, [id=#6069]
                                                          +- SortAggregate(key=[], functions=[partial_min(srch_ci#4825) AS min#4860, partial_max(srch_co#4826) AS max#4862], output=[min#4860, max#4862])
                                                             +- FileScan parquet default.expedia_silver[srch_ci#4825,srch_co#4826] Batched: true, DataFilters: [], Format: Parquet, Location: PreparedDeltaFileIndex(1 paths)[abfss://data@stsafrwesteurope.dfs.core.windows.net/silver/expedia], PartitionFilters: [], PushedFilters: [], ReadSchema: struct<srch_ci:string,srch_co:string>   
-
+```
 * Reading the file and analyzing it
 * Filtering based on the criteria
 * Shuffling data
@@ -161,7 +161,7 @@ AtomicCreateTableAsSelect [num_affected_rows#2641L, num_inserted_rows#2642L], co
 * Task_3 - For visits with extended stay (more than 7 days) calculate weather trend (the day temperature difference between last and first day of stay) and average temperature during stay.
 ![](screenshots/task3.png)
 ![](screenshots/avg3.png)
-
+```
 == Parsed Logical Plan ==
 'Aggregate ['expedia_id, 'hotel_id, 'checkout, 'checkin, 'weather_trend], ['expedia_id, 'hotel_id, 'checkin, 'checkout, 'DATEDIFF('checkout, 'checkin) AS duration#70048, 'weather_trend, 'AVG('avg_tmpr_c) AS average_tmpr#70049]
 +- 'Filter (('wthr_date >= 'checkin) AND ('wthr_date <= 'checkout))
@@ -334,7 +334,7 @@ AdaptiveSparkPlan isFinalPlan=false
                                                 +- Project [id#70256L AS expedia_id#70252L, hotel_id#70275L, srch_ci#70268 AS checkin#70254, srch_co#70269 AS checkout#70255]
                                                    +- Filter ((((isnotnull(srch_co#70269) AND isnotnull(srch_ci#70268)) AND (datediff(cast(srch_co#70269 as date), cast(srch_ci#70268 as date)) > 7)) AND isnotnull(hotel_id#70275L)) AND (isnotnull(srch_ci#70268) OR (srch_ci#70268 = srch_co#70269)))
                                                       +- FileScan parquet default.expedia_silver[id#70256L,srch_ci#70268,srch_co#70269,hotel_id#70275L] Batched: true, DataFilters: [isnotnull(srch_co#70269), isnotnull(srch_ci#70268), (datediff(cast(srch_co#70269 as date), cast(..., Format: Parquet, Location: PreparedDeltaFileIndex(1 paths)[abfss://data@stsafrwesteurope.dfs.core.windows.net/silver/expedia], PartitionFilters: [], PushedFilters: [IsNotNull(srch_co), IsNotNull(srch_ci), IsNotNull(hotel_id)], ReadSchema: struct<id:bigint,srch_ci:string,srch_co:string,hotel_id:bigint>
-
+```
 
 
 
